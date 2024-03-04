@@ -9,11 +9,16 @@ import Avatar from "../../images/avatar.jpg";
 import { useSelector, useDispatch } from "react-redux";
 import { toggleForm } from "../../features/user/userSlice";
 import { useNavigate } from "react-router-dom";
+import { useGetProductsQuery } from "../../features/api/apiSlice";
 const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { currentUser } = useSelector((state) => state.user);
   const [values, setValues] = useState({ name: "Guest", avatar: Avatar });
+  const [searchValue, setSearchValue] = useState("");
+
+  const { data, isLoading } = useGetProductsQuery({ title: searchValue });
+  console.log(data);
 
   useEffect(() => {
     if (!currentUser) return;
@@ -26,6 +31,10 @@ const Header = () => {
     } else {
       navigate(ROUTES.PROFILE);
     }
+  };
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setSearchValue(e.target.value);
   };
 
   return (
@@ -44,6 +53,7 @@ const Header = () => {
           />
           <div className={styles.userName}>{values.name}</div>
         </div>
+
         <form className={styles.form}>
           <div className={styles.icon}>
             <svg className="icon">
@@ -54,13 +64,42 @@ const Header = () => {
             <input
               type="search"
               name="search"
-              autoComplete="off"
               placeholder="Search for anyting..."
-              onChange={() => {}}
-              value={""}
+              autoComplete="off"
+              onChange={handleSearch}
+              value={searchValue}
             />
           </div>
-          {false && <div className={styles.box}></div>}
+
+          {searchValue && (
+            <div className={styles.box}>
+              {isLoading
+                ? "Loading"
+                : !data.length
+                ? "No results"
+                : data.map(({ title, images, id }) => {
+                    return (
+                      <Link
+                        key={id}
+                        onClick={() => setSearchValue("")}
+                        className={styles.item}
+                        to={`/products/${id}`}
+                      >
+                        <div
+                          className={styles.image}
+                          style={{
+                            backgroundImage: `url(${images[0].replace(
+                              /[\[\]\\\"]/g,
+                              ""
+                            )})`,
+                          }}
+                        />
+                        <div className={styles.title}>{title}</div>
+                      </Link>
+                    );
+                  })}
+            </div>
+          )}
         </form>
         <div className={styles.account}>
           {" "}
