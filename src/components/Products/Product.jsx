@@ -41,7 +41,7 @@ const Product = (item) => {
               style={{
                 backgroundImage: `url(${image.replace(/[\[\]\\\"]/g, "")})`,
               }}
-              onClick={() => setCurrentImage(image)}
+              onClick={() => setCurrentImage(image.replace(/[\[\]\\\"]/g, ""))}
             />
           ))}
         </div>
