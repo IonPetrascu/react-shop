@@ -10,3 +10,7 @@ export const buildUrl = (url, params) => {
 
   return urlWithParams;
 };
+
+export const sumBy = (arr) => {
+  return arr.reduce((acc, item) => acc + item, 0);
+};
